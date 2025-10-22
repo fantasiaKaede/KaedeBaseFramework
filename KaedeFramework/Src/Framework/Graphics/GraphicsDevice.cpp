@@ -1,14 +1,27 @@
 #include "GraphicsDevice.h"
-bool GraphicsDevice::Init()
+bool GraphicsDevice::Init(HWND hwnd, int w, int h)
 {
 	if (!CreateFactory())
 	{
 		assert(0 && "ファクトリー作成失敗");
 		return false;
 	}
+
 	if (!CreateDevice())
 	{
 		assert(0 && "D3D12デバイス作成失敗");
+		return false;
+	}
+
+	if (!CreateCommandList())
+	{
+		assert(0 && "コマンドリストの作成失敗");
+		return false;
+	}
+
+	if (!CreateSwapchain(hwnd, w, h))
+	{
+		assert(0 && "スワップチェインの作成失敗");
 		return false;
 	}
 	return true;
@@ -103,6 +116,58 @@ bool GraphicsDevice::CreateDevice()
 			featureLevel = lv;
 			break;//生成可能なバージョンが見つからなかったならループ打ち切り
 		}
+	}
+	return true;
+}
+
+bool GraphicsDevice::CreateCommandList()
+{
+	auto hr = m_pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_pCmdAllocator));
+	if (FAILED(hr))
+	{
+		return false;
+	}
+	hr = m_pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pCmdAllocator.Get(),
+		nullptr, IID_PPV_ARGS(&m_pCmdList));
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	D3D12_COMMAND_QUEUE_DESC cmdQueueDesc = {};
+	cmdQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;			//タイムアウトなし
+	cmdQueueDesc.NodeMask = 0;									//アダプターを１つしか使わないときは0でいい
+	cmdQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;//プライオリティは特に指定なし
+	cmdQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;			//コマンドリストと合わせる
+
+	//キューの作成
+	hr = m_pDevice->CreateCommandQueue(&cmdQueueDesc, IID_PPV_ARGS(&m_pCmdQueue));
+	
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool GraphicsDevice::CreateSwapchain(HWND hwnd, int width, int height)
+{
+	DXGI_SWAP_CHAIN_DESC1 swapchainDesc = {};
+	swapchainDesc.Width = width;
+	swapchainDesc.Height = height;
+	swapchainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	swapchainDesc.SampleDesc.Count = 1;
+	swapchainDesc.BufferUsage = DXGI_USAGE_BACK_BUFFER;
+	swapchainDesc.BufferCount = 2;
+	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;			//フリップ後は速やかに破棄
+	swapchainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;   //ウィンドウとフルスクリーン切り替え可能
+	
+	auto result = m_pDxgiFactory->CreateSwapChainForHwnd(m_pCmdQueue.Get(), hwnd, &swapchainDesc,
+		nullptr, nullptr, (IDXGISwapChain1**)m_pSwapChain.ReleaseAndGetAddressOf());
+	if (FAILED(result))
+	{
+		return false;
 	}
 	return true;
 }

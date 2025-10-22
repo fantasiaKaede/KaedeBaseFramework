@@ -19,6 +19,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 void Application::Excute()
 {
+	static const int width = 1280;
+	static const int heigt = 720;
 	if (!m_window.Create(1280, 720, L"KaedeFramework", L"Window"))
 	{
 		assert(0 && "ウィンドウの生成に失敗");
@@ -26,7 +28,7 @@ void Application::Excute()
 	}
 
 
-	if (!GraphicsDevice::Instance().Init())
+	if (!GraphicsDevice::Instance().Init(m_window.GetWndHandle(),width,heigt))
 	{
 		assert(0, && "グラフィックスデバイス初期化失敗");
 		return;

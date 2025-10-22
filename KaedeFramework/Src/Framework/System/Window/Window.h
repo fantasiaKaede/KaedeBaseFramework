@@ -8,6 +8,7 @@ public:
 	//　　　　　　　　横幅　　　　　　縦幅　　　　　　　　　タイトル名　　　　　　　　　クラス名　　　　　　　　　　　　　　
 	bool Create(int clientWidth, int clientHeight, const std::wstring& titleName, const std::wstring& windowClassName);
 	bool ProcessMessage();
+	HWND GetWndHandle()const { return m_hWnd; }
 private:
 	HWND m_hWnd;
 };
