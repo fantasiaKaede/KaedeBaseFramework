@@ -28,6 +28,12 @@
     <Filter Include="Src\Framework\System\Window">
       <UniqueIdentifier>{616207bf-d273-4f0d-9014-6ac450072ecb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Framework\System\Utility">
+      <UniqueIdentifier>{f0482cad-f597-44f0-ba4e-53d835bee837}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Framework\Graphics">
+      <UniqueIdentifier>{ee594cbc-c2a9-4fff-828a-ce090d089b54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application\Application.h">
@@ -39,6 +45,15 @@
     <ClInclude Include="Src\Framework\Pch.h">
       <Filter>Src\Framework</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Framework\System\System.h">
+      <Filter>Src\Framework\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Framework\System\Utility\Utility.h">
+      <Filter>Src\Framework\System\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Framework\Graphics\GraphicsDevice.h">
+      <Filter>Src\Framework\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Application\Application.cpp">
@@ -49,6 +64,15 @@
     </ClCompile>
     <ClCompile Include="Src\Framework\Pch.cpp">
       <Filter>Src\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Framework\System\Utility\Utility.cpp">
+      <Filter>Src\Framework\System\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Framework\System\System.cpp">
+      <Filter>Src\Framework\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Framework\Graphics\GraphicsDevice.cpp">
+      <Filter>Src\Framework\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

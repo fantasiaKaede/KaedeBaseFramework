@@ -144,11 +144,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application\Application.h" />
+    <ClInclude Include="Src\Framework\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Framework\Pch.h" />
+    <ClInclude Include="Src\Framework\System\System.h" />
+    <ClInclude Include="Src\Framework\System\Utility\Utility.h" />
     <ClInclude Include="Src\Framework\System\Window\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Application\Application.cpp" />
+    <ClCompile Include="Src\Framework\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Framework\Pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pch.h</PrecompiledHeaderFile>
@@ -159,6 +163,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Src\Framework\System\System.cpp" />
+    <ClCompile Include="Src\Framework\System\Utility\Utility.cpp" />
     <ClCompile Include="Src\Framework\System\Window\Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
