@@ -3,25 +3,25 @@ bool GraphicsDevice::Init(HWND hwnd, int w, int h)
 {
 	if (!CreateFactory())
 	{
-		assert(0 && "ƒtƒ@ƒNƒgƒŠ[ì¬¸”s");
+		assert(0 && "ãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼ä½œæˆå¤±æ•—");
 		return false;
 	}
 
 	if (!CreateDevice())
 	{
-		assert(0 && "D3D12ƒfƒoƒCƒXì¬¸”s");
+		assert(0 && "D3D12ãƒ‡ãƒã‚¤ã‚¹ä½œæˆå¤±æ•—");
 		return false;
 	}
 
 	if (!CreateCommandList())
 	{
-		assert(0 && "ƒRƒ}ƒ“ƒhƒŠƒXƒg‚Ìì¬¸”s");
+		assert(0 && "ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã®ä½œæˆå¤±æ•—");
 		return false;
 	}
 
 	if (!CreateSwapchain(hwnd, w, h))
 	{
-		assert(0 && "ƒXƒƒbƒvƒ`ƒFƒCƒ“‚Ìì¬¸”s");
+		assert(0 && "ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚¤ãƒ³ã®ä½œæˆå¤±æ•—");
 		return false;
 	}
 	return true;
@@ -45,7 +45,7 @@ bool GraphicsDevice::CreateDevice()
 	ComPtr<IDXGIAdapter>pSelectAdapter = nullptr;
 	std::vector<ComPtr<IDXGIAdapter>>pAdapters;
 	std::vector<DXGI_ADAPTER_DESC>descs;
-	//g—p’†PC‚É‚ ‚éGPUƒhƒ‰ƒCƒo[‚ğŒŸõ‚µ‚ÄA‚ ‚ê‚ÎŠi”[‚·‚é
+	//ä½¿ç”¨ä¸­PCã«ã‚ã‚‹GPUãƒ‰ãƒ©ã‚¤ãƒãƒ¼ã‚’æ¤œç´¢ã—ã¦ã€ã‚ã‚Œã°æ ¼ç´ã™ã‚‹
 	for (UINT index = 0; 1; ++index)
 	{
 		pAdapters.push_back(nullptr);
@@ -56,7 +56,7 @@ bool GraphicsDevice::CreateDevice()
 	}
 	GPUTier gpuTier = GPUTier::Kind;
 
-	//—Dæ“x‚Ì‚‚¢GPUƒhƒ‰ƒCƒo[‚ğg—p‚·‚é
+	//å„ªå…ˆåº¦ã®é«˜ã„GPUãƒ‰ãƒ©ã‚¤ãƒãƒ¼ã‚’ä½¿ç”¨ã™ã‚‹
 	for (int i = 0; i < descs.size(); ++i)
 	{
 		
@@ -89,7 +89,7 @@ bool GraphicsDevice::CreateDevice()
 				gpuTier = GPUTier::Arm;
 			}
 		}
-		else if (std::wstring(descs[i].Description).find(L":Qualcomm") != std::wstring::npos)
+		else if (std::wstring(descs[i].Description).find(L"Qualcomm") != std::wstring::npos)
 		{
 			if (gpuTier > GPUTier::Qualcomm)
 			{
@@ -107,14 +107,14 @@ bool GraphicsDevice::CreateDevice()
 		D3D_FEATURE_LEVEL_11_0,
 	};
 
-	//Direct3DƒfƒoƒCƒX‚Ì‰Šú‰»
+	//Direct3Dãƒ‡ãƒã‚¤ã‚¹ã®åˆæœŸåŒ–
 	D3D_FEATURE_LEVEL featureLevel;
 	for (auto lv : levels)
 	{
 		if (D3D12CreateDevice(pSelectAdapter.Get(), lv, IID_PPV_ARGS(&m_pDevice)) == S_OK)
 		{
 			featureLevel = lv;
-			break;//¶¬‰Â”\‚Èƒo[ƒWƒ‡ƒ“‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½‚È‚çƒ‹[ƒv‘Å‚¿Ø‚è
+			break;//ç”Ÿæˆå¯èƒ½ãªãƒãƒ¼ã‚¸ãƒ§ãƒ³ãŒè¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸãªã‚‰ãƒ«ãƒ¼ãƒ—æ‰“ã¡åˆ‡ã‚Š
 		}
 	}
 	return true;
@@ -135,12 +135,12 @@ bool GraphicsDevice::CreateCommandList()
 	}
 
 	D3D12_COMMAND_QUEUE_DESC cmdQueueDesc = {};
-	cmdQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;			//ƒ^ƒCƒ€ƒAƒEƒg‚È‚µ
-	cmdQueueDesc.NodeMask = 0;									//ƒAƒ_ƒvƒ^[‚ğ‚P‚Â‚µ‚©g‚í‚È‚¢‚Æ‚«‚Í0‚Å‚¢‚¢
-	cmdQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;//ƒvƒ‰ƒCƒIƒŠƒeƒB‚Í“Á‚Éw’è‚È‚µ
-	cmdQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;			//ƒRƒ}ƒ“ƒhƒŠƒXƒg‚Æ‡‚í‚¹‚é
+	cmdQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;			//ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆãªã—
+	cmdQueueDesc.NodeMask = 0;									//ã‚¢ãƒ€ãƒ—ã‚¿ãƒ¼ã‚’ï¼‘ã¤ã—ã‹ä½¿ã‚ãªã„ã¨ãã¯0ã§ã„ã„
+	cmdQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;//ãƒ—ãƒ©ã‚¤ã‚ªãƒªãƒ†ã‚£ã¯ç‰¹ã«æŒ‡å®šãªã—
+	cmdQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;			//ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã¨åˆã‚ã›ã‚‹
 
-	//ƒLƒ…[‚Ìì¬
+	//ã‚­ãƒ¥ãƒ¼ã®ä½œæˆ
 	hr = m_pDevice->CreateCommandQueue(&cmdQueueDesc, IID_PPV_ARGS(&m_pCmdQueue));
 	
 	if (FAILED(hr))
@@ -160,8 +160,8 @@ bool GraphicsDevice::CreateSwapchain(HWND hwnd, int width, int height)
 	swapchainDesc.SampleDesc.Count = 1;
 	swapchainDesc.BufferUsage = DXGI_USAGE_BACK_BUFFER;
 	swapchainDesc.BufferCount = 2;
-	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;			//ƒtƒŠƒbƒvŒã‚Í‘¬‚â‚©‚É”jŠü
-	swapchainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;   //ƒEƒBƒ“ƒhƒE‚Æƒtƒ‹ƒXƒNƒŠ[ƒ“Ø‚è‘Ö‚¦‰Â”\
+	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;			//ãƒ•ãƒªãƒƒãƒ—å¾Œã¯é€Ÿã‚„ã‹ã«ç ´æ£„
+	swapchainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;   //ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã¨ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åˆ‡ã‚Šæ›¿ãˆå¯èƒ½
 	
 	auto result = m_pDxgiFactory->CreateSwapChainForHwnd(m_pCmdQueue.Get(), hwnd, &swapchainDesc,
 		nullptr, nullptr, (IDXGISwapChain1**)m_pSwapChain.ReleaseAndGetAddressOf());
