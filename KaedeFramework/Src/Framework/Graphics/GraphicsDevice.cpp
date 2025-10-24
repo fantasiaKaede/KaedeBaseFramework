@@ -1,29 +1,46 @@
 #include "GraphicsDevice.h"
+
 bool GraphicsDevice::Init(HWND hwnd, int w, int h)
 {
 	if (!CreateFactory())
 	{
-		assert(0 && "ãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼ä½œæˆå¤±æ•—");
+		assert(0 && "ƒtƒ@ƒNƒgƒŠ[ì¬¸”s");
 		return false;
 	}
 
 	if (!CreateDevice())
 	{
-		assert(0 && "D3D12ãƒ‡ãƒã‚¤ã‚¹ä½œæˆå¤±æ•—");
+		assert(0 && "D3D12ƒfƒoƒCƒXì¬¸”s");
 		return false;
 	}
 
 	if (!CreateCommandList())
 	{
-		assert(0 && "ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã®ä½œæˆå¤±æ•—");
+		assert(0 && "ƒRƒ}ƒ“ƒhƒŠƒXƒg‚Ìì¬¸”s");
 		return false;
 	}
 
 	if (!CreateSwapchain(hwnd, w, h))
 	{
-		assert(0 && "ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚¤ãƒ³ã®ä½œæˆå¤±æ•—");
+		assert(0 && "ƒXƒƒbƒvƒ`ƒFƒCƒ“‚Ìì¬¸”s");
 		return false;
 	}
+
+	m_pRTVHeap = std::make_unique<RTVHeap>();
+	if (!m_pRTVHeap->Create(m_pDevice.Get(), 100))
+	{
+		// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg—pƒq[ƒvì¬
+		// ‘«‚è‚È‚¢ê‡‚Í‘æ“ñˆø”‚ğ‘‚â‚·
+		assert(0 && "RTVƒq[ƒv‚Ìì¬¸”s");
+		return false;
+	}
+
+	if (!CreateSwapchainRTV())
+	{
+		assert(0 && "ƒXƒƒbƒvƒ`ƒFƒCƒ“RTV‚Ìì¬¸”s");
+		return false;
+	}
+
 	return true;
 }
 
@@ -32,7 +49,7 @@ bool GraphicsDevice::CreateFactory()
 	UINT flagsDXGI = 0;
 	flagsDXGI |= DXGI_CREATE_FACTORY_DEBUG;
 	auto result = CreateDXGIFactory2(flagsDXGI, IID_PPV_ARGS(m_pDxgiFactory.GetAddressOf()));
-	
+
 	if (FAILED(result))
 	{
 		return false;
@@ -42,24 +59,25 @@ bool GraphicsDevice::CreateFactory()
 
 bool GraphicsDevice::CreateDevice()
 {
-	ComPtr<IDXGIAdapter>pSelectAdapter = nullptr;
-	std::vector<ComPtr<IDXGIAdapter>>pAdapters;
-	std::vector<DXGI_ADAPTER_DESC>descs;
-	//ä½¿ç”¨ä¸­PCã«ã‚ã‚‹GPUãƒ‰ãƒ©ã‚¤ãƒãƒ¼ã‚’æ¤œç´¢ã—ã¦ã€ã‚ã‚Œã°æ ¼ç´ã™ã‚‹
+	ComPtr<IDXGIAdapter> pSelectAdapter = nullptr;
+	std::vector<ComPtr<IDXGIAdapter>> pAdapters;
+	std::vector<DXGI_ADAPTER_DESC> descs;
+
+	// g—p’†PC‚É‚ ‚éGPUƒhƒ‰ƒCƒo[‚ğŒŸõ‚µ‚ÄA‚ ‚ê‚ÎŠi”[‚·‚é
 	for (UINT index = 0; 1; ++index)
 	{
 		pAdapters.push_back(nullptr);
 		HRESULT ret = m_pDxgiFactory->EnumAdapters(index, &pAdapters[index]);
-		if (ret == DXGI_ERROR_NOT_FOUND)break;
+		if (ret == DXGI_ERROR_NOT_FOUND) break;
 		descs.push_back({});
 		pAdapters[index]->GetDesc(&descs[index]);
 	}
+
 	GPUTier gpuTier = GPUTier::Kind;
 
-	//å„ªå…ˆåº¦ã®é«˜ã„GPUãƒ‰ãƒ©ã‚¤ãƒãƒ¼ã‚’ä½¿ç”¨ã™ã‚‹
+	// —Dæ“x‚Ì‚‚¢GPUƒhƒ‰ƒCƒo[‚ğg—p‚·‚é
 	for (int i = 0; i < descs.size(); ++i)
 	{
-		
 		if (std::wstring(descs[i].Description).find(L"NVIDIA") != std::wstring::npos)
 		{
 			pSelectAdapter = pAdapters[i];
@@ -107,14 +125,14 @@ bool GraphicsDevice::CreateDevice()
 		D3D_FEATURE_LEVEL_11_0,
 	};
 
-	//Direct3Dãƒ‡ãƒã‚¤ã‚¹ã®åˆæœŸåŒ–
+	// Direct3DƒfƒoƒCƒX‚Ì‰Šú‰»
 	D3D_FEATURE_LEVEL featureLevel;
 	for (auto lv : levels)
 	{
 		if (D3D12CreateDevice(pSelectAdapter.Get(), lv, IID_PPV_ARGS(&m_pDevice)) == S_OK)
 		{
 			featureLevel = lv;
-			break;//ç”Ÿæˆå¯èƒ½ãªãƒãƒ¼ã‚¸ãƒ§ãƒ³ãŒè¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸãªã‚‰ãƒ«ãƒ¼ãƒ—æ‰“ã¡åˆ‡ã‚Š
+			break; // ¶¬‰Â”\‚Èƒo[ƒWƒ‡ƒ“‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½‚È‚çƒ‹[ƒv‘Å‚¿Ø‚è
 		}
 	}
 	return true;
@@ -127,6 +145,7 @@ bool GraphicsDevice::CreateCommandList()
 	{
 		return false;
 	}
+
 	hr = m_pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pCmdAllocator.Get(),
 		nullptr, IID_PPV_ARGS(&m_pCmdList));
 	if (FAILED(hr))
@@ -135,14 +154,13 @@ bool GraphicsDevice::CreateCommandList()
 	}
 
 	D3D12_COMMAND_QUEUE_DESC cmdQueueDesc = {};
-	cmdQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;			//ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆãªã—
-	cmdQueueDesc.NodeMask = 0;									//ã‚¢ãƒ€ãƒ—ã‚¿ãƒ¼ã‚’ï¼‘ã¤ã—ã‹ä½¿ã‚ãªã„ã¨ãã¯0ã§ã„ã„
-	cmdQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;//ãƒ—ãƒ©ã‚¤ã‚ªãƒªãƒ†ã‚£ã¯ç‰¹ã«æŒ‡å®šãªã—
-	cmdQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;			//ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã¨åˆã‚ã›ã‚‹
+	cmdQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;            // ƒ^ƒCƒ€ƒAƒEƒg‚È‚µ
+	cmdQueueDesc.NodeMask = 0;                                     // ƒAƒ_ƒvƒ^[‚ğ1‚Â‚µ‚©g‚í‚È‚¢‚Æ‚«‚Í0‚Å‚¢‚¢
+	cmdQueueDesc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;   // ƒvƒ‰ƒCƒIƒŠƒeƒB‚Í“Á‚Éw’è‚È‚µ
+	cmdQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;            // ƒRƒ}ƒ“ƒhƒŠƒXƒg‚Æ‡‚í‚¹‚é
 
-	//ã‚­ãƒ¥ãƒ¼ã®ä½œæˆ
+	// ƒLƒ…[‚Ìì¬
 	hr = m_pDevice->CreateCommandQueue(&cmdQueueDesc, IID_PPV_ARGS(&m_pCmdQueue));
-	
 	if (FAILED(hr))
 	{
 		return false;
@@ -160,14 +178,35 @@ bool GraphicsDevice::CreateSwapchain(HWND hwnd, int width, int height)
 	swapchainDesc.SampleDesc.Count = 1;
 	swapchainDesc.BufferUsage = DXGI_USAGE_BACK_BUFFER;
 	swapchainDesc.BufferCount = 2;
-	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;			//ãƒ•ãƒªãƒƒãƒ—å¾Œã¯é€Ÿã‚„ã‹ã«ç ´æ£„
-	swapchainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;   //ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã¨ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åˆ‡ã‚Šæ›¿ãˆå¯èƒ½
-	
-	auto result = m_pDxgiFactory->CreateSwapChainForHwnd(m_pCmdQueue.Get(), hwnd, &swapchainDesc,
-		nullptr, nullptr, (IDXGISwapChain1**)m_pSwapChain.ReleaseAndGetAddressOf());
+	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;      // ƒtƒŠƒbƒvŒã‚Í‘¬‚â‚©‚É”jŠü
+	swapchainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;  // ƒEƒBƒ“ƒhƒE‚Æƒtƒ‹ƒXƒNƒŠ[ƒ“Ø‚è‘Ö‚¦‰Â”\
+
+	auto result = m_pDxgiFactory->CreateSwapChainForHwnd(
+		m_pCmdQueue.Get(),
+		hwnd,
+		&swapchainDesc,
+		nullptr,
+		nullptr,
+		(IDXGISwapChain1**)m_pSwapChain.ReleaseAndGetAddressOf()
+	);
 	if (FAILED(result))
 	{
 		return false;
+	}
+
+	return true;
+}
+
+bool GraphicsDevice::CreateSwapchainRTV()
+{
+	for (int i = 0; i < static_cast<int>(m_pSwapchainBuffers.size()); ++i)
+	{
+		auto hr = m_pSwapChain->GetBuffer(i, IID_PPV_ARGS(&m_pSwapchainBuffers[i]));
+		if (FAILED(hr))
+		{
+			return false;
+		}
+		m_pRTVHeap->CreateRTV(m_pSwapchainBuffers[i].Get());
 	}
 	return true;
 }

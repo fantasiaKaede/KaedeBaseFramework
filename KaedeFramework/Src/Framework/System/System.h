@@ -1,13 +1,16 @@
 #pragma once
+
 //================================
-//便利機能
+// 便利機能
 //================================
-#include"Utility/Utility.h"
+#include "Utility/Utility.h"
+
 //================================
-//描画関係のデバイス
+// 描画関係のデバイス
 //================================
-#include"../Graphics/GraphicsDevice.h"
+#include "../Graphics/GraphicsDevice.h"
+
 //================================
-//RTVヒープ
+// RTVヒープ
 //================================
-#include"../Graphics/RTVHeap/RTVHeap.h"
+#include "../Graphics/RTVHeap/RTVHeap.h"
