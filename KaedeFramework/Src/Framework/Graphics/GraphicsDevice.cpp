@@ -7,6 +7,9 @@ bool GraphicsDevice::Init(HWND hwnd, int w, int h)
 		assert(0 && "ファクトリー作成失敗");
 		return false;
 	}
+#ifdef _DEBUG
+	EnableDebugLayer();
+#endif // _DEBUG
 
 	if (!CreateDevice())
 	{
@@ -41,7 +44,56 @@ bool GraphicsDevice::Init(HWND hwnd, int w, int h)
 		return false;
 	}
 
+	if(!CreateFence())
+	{
+		assert(0 && "フェンスの作成失敗");
+		return false;
+	}
+
 	return true;
+}
+
+void GraphicsDevice::ScreenFlip()
+{
+	//1リソースバリアもステートをレンダーターゲットに変更
+	auto bbIdx = m_pSwapChain->GetCurrentBackBufferIndex();
+	SetResourceBarrier(m_pSwapchainBuffers[bbIdx].Get(),D3D12_RESOURCE_STATE_PRESENT,D3D12_RESOURCE_STATE_RENDER_TARGET);
+	//2レンダーターゲットをセット
+	auto rtvH = m_pRTVHeap->GetRTVCPUHandle(bbIdx);
+	m_pCmdList->OMSetRenderTargets(1, &rtvH, false, nullptr);
+	//3セットしたレンダーターゲットの画面クリア
+	float clearColor[] = { 1.0f,0.0f,1.0f,1.0f };//紫
+	m_pCmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
+	//4リソースバリアのステートをプレゼントに戻す
+	SetResourceBarrier(m_pSwapchainBuffers[bbIdx].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
+		D3D12_RESOURCE_STATE_PRESENT);
+	//5コマンドリストを閉じて実行する
+	m_pCmdList->Close();
+	ID3D12CommandList* cmdLists[] = { m_pCmdList.Get() };
+	m_pCmdQueue->ExecuteCommandLists(1, cmdLists);
+	//6コマンドリストの同期を待つ
+	WaitForCommandQueue();
+	//7コマンドアロケータとコマンドリストを初期化
+	m_pCmdAllocator->Reset();							//コマンドアロケーターの初期化
+	m_pCmdList->Reset(m_pCmdAllocator.Get(), nullptr);	//コマンドリストの初期化
+	//8スワップチェインにプレゼント（送る）
+	m_pSwapChain->Present(1, 0);
+}
+
+void GraphicsDevice::WaitForCommandQueue()
+{
+	m_pCmdQueue->Signal(m_pFence.Get(), ++m_fenceVal);
+	if (m_pFence->GetCompletedValue() != m_fenceVal)
+	{
+		auto event = CreateEvent(nullptr, false, false, nullptr);//イベントハンドルの作成
+		if(!event)
+		{
+			assert(0 && "イベントハンドルエラー、アプリケーションを終了します");
+		}
+		m_pFence->SetEventOnCompletion(m_fenceVal, event);
+		WaitForSingleObject(event, INFINITE);//イベントの待機
+		CloseHandle(event);//イベントハンドルの破棄
+	}
 }
 
 bool GraphicsDevice::CreateFactory()
@@ -209,4 +261,31 @@ bool GraphicsDevice::CreateSwapchainRTV()
 		m_pRTVHeap->CreateRTV(m_pSwapchainBuffers[i].Get());
 	}
 	return true;
+}
+
+bool GraphicsDevice::CreateFence()
+{
+	auto hr = m_pDevice->CreateFence(m_fenceVal,D3D12_FENCE_FLAG_NONE,IID_PPV_ARGS(&m_pFence));
+	if (FAILED(hr))
+	{
+		return false;
+	}
+	return true;
+}
+
+void GraphicsDevice::SetResourceBarrier(ID3D12Resource* pResource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after)
+{
+	D3D12_RESOURCE_BARRIER barrier = {};
+	barrier.Transition.pResource = pResource;
+	barrier.Transition.StateAfter = after;
+	barrier.Transition.StateBefore = before;
+	m_pCmdList->ResourceBarrier(1, &barrier);
+}
+
+void GraphicsDevice::EnableDebugLayer()
+{
+	ID3D12Debug* debugLayer = nullptr;
+	D3D12GetDebugInterface(IID_PPV_ARGS(&debugLayer));
+	debugLayer->EnableDebugLayer();//デバッグレイヤーを有効化
+	debugLayer->Release();
 }

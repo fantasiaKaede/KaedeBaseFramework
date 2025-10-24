@@ -37,6 +37,11 @@ void Application::Excute()
 
 	while (true)
 	{
-		if (!m_window.ProcessMessage())break;
+		if (!m_window.ProcessMessage())
+		{
+			GraphicsDevice::Instance().WaitForCommandQueue();//I—¹‘O‚ÉGPU‚Ìˆ—‚ğ‘Ò‚Â
+			break;
+		}
+		GraphicsDevice::Instance().ScreenFlip();
 	}
 }
