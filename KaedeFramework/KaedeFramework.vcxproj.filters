@@ -40,6 +40,15 @@
     <Filter Include="Src\Framework\Graphics\Mesh">
       <UniqueIdentifier>{26c1317c-a838-4708-a8a0-b2dd3de1ca78}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Framework\Graphics\Shader">
+      <UniqueIdentifier>{710042b6-43fb-4348-806c-23ebcb322bf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Framework\Graphics\Shader\RootSignature">
+      <UniqueIdentifier>{c9c0986e-5a6f-410f-875f-544a20227fc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Framework\Graphics\Shader\Pipeline">
+      <UniqueIdentifier>{3a6adeba-8fcd-49b1-a26c-dd8f684aa8ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application\Application.h">
@@ -65,6 +74,15 @@
     </ClInclude>
     <ClInclude Include="Src\Framework\Graphics\Mesh\Mesh.h">
       <Filter>Src\Framework\Graphics\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Framework\Graphics\Shader\Shader.h">
+      <Filter>Src\Framework\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Framework\Graphics\Shader\RootSignature\RootSignature.h">
+      <Filter>Src\Framework\Graphics\Shader\RootSignature</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Framework\Graphics\Shader\Pipeline\Pipeline.h">
+      <Filter>Src\Framework\Graphics\Shader\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -92,8 +110,25 @@
     <ClCompile Include="Src\Framework\Graphics\Mesh\Mesh.cpp">
       <Filter>Src\Framework\Graphics\Mesh</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Framework\Graphics\Shader\Shader.cpp">
+      <Filter>Src\Framework\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Framework\Graphics\Shader\RootSignature\RootSignature.cpp">
+      <Filter>Src\Framework\Graphics\Shader\RootSignature</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Framework\Graphics\Shader\Pipeline\Pipeline.cpp">
+      <Filter>Src\Framework\Graphics\Shader\Pipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Src\Framework\Graphics\Shader\SimpleShader_VS.hlsl">
+      <Filter>Src\Framework\Graphics\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Src\Framework\Graphics\Shader\SimpleShader_PS.hlsl">
+      <Filter>Src\Framework\Graphics\Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
