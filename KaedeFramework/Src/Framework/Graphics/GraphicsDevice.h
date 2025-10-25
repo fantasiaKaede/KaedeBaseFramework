@@ -12,6 +12,9 @@ public:
 
 	//コマンドキューの同期待ち
 	void WaitForCommandQueue();
+
+	ID3D12Device8* GetDevice()const { return m_pDevice.Get(); }
+	ID3D12GraphicsCommandList6* GetCommandList()const { return m_pCmdList.Get(); }
 private:
 	GraphicsDevice() {}
 	~GraphicsDevice() {}

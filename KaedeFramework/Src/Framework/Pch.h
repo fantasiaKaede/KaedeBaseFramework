@@ -48,6 +48,11 @@
 #include<d3d12.h>
 #include<dxgi1_6.h>
 //================================
+//DirectX Tool Kit
+//================================
+#pragma comment(lib,"DirectXTK12.lib")
+#include<SimpleMath.h>
+//================================
 //©ìƒVƒXƒeƒ€
 //================================
 #include"System/System.h"
