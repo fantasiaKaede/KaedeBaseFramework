@@ -43,5 +43,82 @@ void Application::Excute()
 			break;
 		}
 		GraphicsDevice::Instance().ScreenFlip();
+		//=========================================
+		//
+		// アプリケーション更新処理
+		//
+		//=========================================
+		DeltaTime::Instance().Update();
+		BeginUpdate();
+		{
+			PreUpdate();
+
+			Update();
+
+			PostUpdate();
+		}
+		EndUpdate();
+
+		//=========================================
+		//
+		// アプリケーション描画処理
+		//
+		//=========================================
+
+		BeginDraw();
+		{
+			PreDraw();
+
+			Draw();
+
+			PostDraw();
+
+			DrawSprite();
+		}
+		EndDraw();
 	}
+}
+
+void Application::BeginUpdate()
+{
+}
+
+void Application::PreUpdate()
+{
+}
+
+void Application::Update()
+{
+}
+
+void Application::PostUpdate()
+{
+}
+
+void Application::EndUpdate()
+{
+}
+
+void Application::BeginDraw(bool usePostProcess)
+{
+}
+
+void Application::PreDraw()
+{
+}
+
+void Application::Draw()
+{
+}
+
+void Application::PostDraw()
+{
+}
+
+void Application::DrawSprite()
+{
+}
+
+void Application::EndDraw()
+{
 }

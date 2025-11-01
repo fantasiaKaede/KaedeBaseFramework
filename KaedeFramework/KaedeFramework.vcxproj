@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application\Application.h" />
+    <ClInclude Include="Src\Framework\DeltaTime\DeltaTime.h" />
     <ClInclude Include="Src\Framework\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Framework\Graphics\Mesh\Mesh.h" />
     <ClInclude Include="Src\Framework\Graphics\RTVHeap\RTVHeap.h" />
