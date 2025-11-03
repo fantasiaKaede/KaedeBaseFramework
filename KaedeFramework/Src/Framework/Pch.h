@@ -13,6 +13,9 @@
 #include<cassert>
 
 #include<wrl/client.h>
+
+#include<D3Dcompiler.h>//シェーダーコンパイラ
+#pragma comment(lib, "d3dcompiler.lib")
 //================================
 //STL
 //================================

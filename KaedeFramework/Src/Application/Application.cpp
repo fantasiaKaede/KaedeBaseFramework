@@ -34,7 +34,17 @@ void Application::Excute()
 		return;
 	}
 
+	Mesh mesh;
+	mesh.Create(&GraphicsDevice::Instance());
 
+	RenderingSetting renderingSetting = {};
+	renderingSetting.InputLayouts = { InputLayout::POSITION};
+	renderingSetting.Formats = { DXGI_FORMAT_R8G8B8A8_UNORM };
+	renderingSetting.IsDepth = false;
+	renderingSetting.IsDepthMask = false;
+	Shader shader;
+	shader.Create(&GraphicsDevice::Instance(), L"SimpleShader", renderingSetting, {});
+	
 	while (true)
 	{
 		if (!m_window.ProcessMessage())
@@ -42,7 +52,6 @@ void Application::Excute()
 			GraphicsDevice::Instance().WaitForCommandQueue();//終了前にGPUの処理を待つ
 			break;
 		}
-		GraphicsDevice::Instance().ScreenFlip();
 		//=========================================
 		//
 		// アプリケーション更新処理
@@ -65,6 +74,11 @@ void Application::Excute()
 		//
 		//=========================================
 
+
+		
+
+
+
 		BeginDraw();
 		{
 			PreDraw();
@@ -76,6 +90,10 @@ void Application::Excute()
 			DrawSprite();
 		}
 		EndDraw();
+		GraphicsDevice::Instance().Prepare();
+		shader.Begin(width, heigt);
+		shader.DrawMesh(mesh);
+		GraphicsDevice::Instance().ScreenFlip();
 	}
 }
 

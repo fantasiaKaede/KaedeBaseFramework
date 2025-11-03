@@ -30,7 +30,7 @@ public:
 	ID3D12RootSignature* GetRootSignature()const { return m_pRootSignature.Get(); }
 private:
 	//レンジの作成
-	void CreateRanges(D3D12_DESCRIPTOR_RANGE& pRange, RangeType type, int count);
+	void CreateRange(D3D12_DESCRIPTOR_RANGE& pRange, RangeType type, int count);
 	//サンプラーの作成
 	void CreateSampler(D3D12_STATIC_SAMPLER_DESC& pSamplerDesc, TextureAddressMode mode,
 		D3D12Filter filter, int count);

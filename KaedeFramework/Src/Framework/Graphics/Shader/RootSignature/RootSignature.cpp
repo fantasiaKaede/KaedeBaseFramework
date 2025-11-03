@@ -29,7 +29,7 @@ void RootSignature::Create(GraphicsDevice* pGraphicsDevice, const std::vector<Ra
 		switch (rangeTypes[i])
 		{
 		case RangeType::CBV:
-			CreateRanges(ranges[i], RangeType::CBV, cbvCount);
+			CreateRange(ranges[i], RangeType::CBV, cbvCount);
 			rootParams[i].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 			rootParams[i].DescriptorTable.pDescriptorRanges = &ranges[i];
 			rootParams[i].DescriptorTable.NumDescriptorRanges = 1;
@@ -37,7 +37,7 @@ void RootSignature::Create(GraphicsDevice* pGraphicsDevice, const std::vector<Ra
 			++cbvCount;
 			break;
 		case RangeType::SRV:
-			CreateRanges(ranges[i], RangeType::SRV, samplerCount);
+			CreateRange(ranges[i], RangeType::SRV, samplerCount);
 			rootParams[i].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 			rootParams[i].DescriptorTable.pDescriptorRanges = &ranges[i];
 			rootParams[i].DescriptorTable.NumDescriptorRanges = 1;
@@ -46,7 +46,7 @@ void RootSignature::Create(GraphicsDevice* pGraphicsDevice, const std::vector<Ra
 			bSampler = true;
 			break;
 		case RangeType::UAV:
-			CreateRanges(ranges[i], RangeType::UAV, uavCount);
+			CreateRange(ranges[i], RangeType::UAV, uavCount);
 			rootParams[i].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 			rootParams[i].DescriptorTable.pDescriptorRanges = &ranges[i];
 			rootParams[i].DescriptorTable.NumDescriptorRanges = 1;
@@ -91,10 +91,52 @@ void RootSignature::Create(GraphicsDevice* pGraphicsDevice, const std::vector<Ra
 	}
 }
 
-void RootSignature::CreateRanges(D3D12_DESCRIPTOR_RANGE& pRange, RangeType type, int count)
+void RootSignature::CreateRange(D3D12_DESCRIPTOR_RANGE& pRange, RangeType type, int count)
 {
+	switch (type)
+	{
+	case RangeType::CBV:
+		pRange = {};
+		pRange.NumDescriptors = 1;
+		pRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+		pRange.BaseShaderRegister = count;
+		pRange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		break;
+	case RangeType::SRV:
+		pRange = {};
+		pRange.NumDescriptors = 1;
+		pRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+		pRange.BaseShaderRegister = count;
+		pRange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		break;
+	case RangeType::UAV:
+		pRange = {};
+		pRange.NumDescriptors = 1;
+		pRange.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+		pRange.BaseShaderRegister = count;
+		pRange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+		break;
+	default:
+		break;
+	}
 }
 
 void RootSignature::CreateSampler(D3D12_STATIC_SAMPLER_DESC& pSamplerDesc, TextureAddressMode mode, D3D12Filter filter, int count)
 {
+	D3D12_TEXTURE_ADDRESS_MODE addressMode = mode == TextureAddressMode::Wrap ?
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP : D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+	D3D12_FILTER samplerFilter = filter == D3D12Filter::Point ?
+		D3D12_FILTER_MIN_MAG_MIP_POINT : D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	pSamplerDesc = {};
+	pSamplerDesc.AddressU = addressMode;
+	pSamplerDesc.AddressV = addressMode;
+	pSamplerDesc.AddressW = addressMode;
+	pSamplerDesc.BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK;
+	pSamplerDesc.Filter = samplerFilter;
+	pSamplerDesc.MaxLOD = D3D12_FLOAT32_MAX;
+	pSamplerDesc.MinLOD = 0.0f;
+	pSamplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+	pSamplerDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	pSamplerDesc.MaxAnisotropy = 16;
+	pSamplerDesc.ShaderRegister = count;
 }

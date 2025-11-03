@@ -3,8 +3,7 @@
 class Mesh
 {
 public:
-	Mesh(){}
-	~Mesh(){}
+
 	//作成
 	//グラフィックスデバイスのポインタ
 	void Create(GraphicsDevice*pGraphicsDevice);

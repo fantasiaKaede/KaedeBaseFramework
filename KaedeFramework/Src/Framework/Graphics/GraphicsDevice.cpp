@@ -53,30 +53,36 @@ bool GraphicsDevice::Init(HWND hwnd, int w, int h)
 	return true;
 }
 
-void GraphicsDevice::ScreenFlip()
+void GraphicsDevice::Prepare()
 {
-	//1リソースバリアもステートをレンダーターゲットに変更
 	auto bbIdx = m_pSwapChain->GetCurrentBackBufferIndex();
-	SetResourceBarrier(m_pSwapchainBuffers[bbIdx].Get(),D3D12_RESOURCE_STATE_PRESENT,D3D12_RESOURCE_STATE_RENDER_TARGET);
-	//2レンダーターゲットをセット
+	SetResourceBarrier(m_pSwapchainBuffers[bbIdx].Get(),
+		D3D12_RESOURCE_STATE_PRESENT,
+		D3D12_RESOURCE_STATE_RENDER_TARGET);
+
 	auto rtvH = m_pRTVHeap->GetRTVCPUHandle(bbIdx);
 	m_pCmdList->OMSetRenderTargets(1, &rtvH, false, nullptr);
-	//3セットしたレンダーターゲットの画面クリア
-	float clearColor[] = { 1.0f,0.0f,1.0f,1.0f };//紫
+
+	float clearColor[] = { 1.0f,0.0f,1.0f,1.0f };
 	m_pCmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
-	//4リソースバリアのステートをプレゼントに戻す
-	SetResourceBarrier(m_pSwapchainBuffers[bbIdx].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
+}
+
+void GraphicsDevice::ScreenFlip()
+{
+	//5コマンドリストをクローズしてキューに実行を指示
+	auto bbIdx = m_pSwapChain->GetCurrentBackBufferIndex();
+	SetResourceBarrier(m_pSwapchainBuffers[bbIdx].Get(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
 		D3D12_RESOURCE_STATE_PRESENT);
-	//5コマンドリストを閉じて実行する
 	m_pCmdList->Close();
 	ID3D12CommandList* cmdLists[] = { m_pCmdList.Get() };
 	m_pCmdQueue->ExecuteCommandLists(1, cmdLists);
-	//6コマンドリストの同期を待つ
+	//2コマンドリストの同期を待つ
 	WaitForCommandQueue();
-	//7コマンドアロケータとコマンドリストを初期化
+	//3コマンドアロケータとコマンドリストを初期化
 	m_pCmdAllocator->Reset();							//コマンドアロケーターの初期化
 	m_pCmdList->Reset(m_pCmdAllocator.Get(), nullptr);	//コマンドリストの初期化
-	//8スワップチェインにプレゼント（送る）
+	//4スワップチェインにプレゼント（送る）
 	m_pSwapChain->Present(1, 0);
 }
 

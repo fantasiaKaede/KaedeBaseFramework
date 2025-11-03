@@ -39,6 +39,9 @@ void Mesh::Create(GraphicsDevice* pGraphicsDevice)
 		assert(0 && "頂点バッファの生成に失敗");
 		return;
 	}
+	m_vbView.BufferLocation = m_pVBuffer->GetGPUVirtualAddress();
+	m_vbView.SizeInBytes = (UINT)resDesc.Width;
+	m_vbView.StrideInBytes = sizeof(Math::Vector3);
 	//頂点バッファにデータ転送
 	Math::Vector3* vbMap = nullptr;
 	{

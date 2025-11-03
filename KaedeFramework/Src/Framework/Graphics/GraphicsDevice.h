@@ -7,6 +7,10 @@ public:
 	//成功したらtrue
 	bool Init(HWND hwnd, int w, int h);
 
+
+	//描画準備
+	void Prepare();
+
 	//画面（スワップチェイン）の切り替え
 	void ScreenFlip();
 
